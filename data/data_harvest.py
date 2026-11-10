@@ -5,7 +5,7 @@ import os
 
 
 def main():
-    db_status = test_DB
+    db_status = test_DB()
     
     if db_status:
         links = ecobici_links()

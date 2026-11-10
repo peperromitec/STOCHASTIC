@@ -82,6 +82,7 @@ def sql_write_df(df, file_name):
         
 def test_DB():
     try:
+        load_dotenv()
         # 1. Configurar la conexión
         usuario = os.getenv("DB_USER", "postgres")
         password = os.getenv("DB_PASSWORD", "password")
