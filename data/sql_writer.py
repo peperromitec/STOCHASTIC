@@ -20,7 +20,7 @@ def sql_write_df(df, file_name):
         'Edad_Usuario': 'age',
         'Bici': 'bicycle_id',
         'Ciclo_Estacion_Retiro': 'begin_station',
-        'Ciclo_Estacion_Arribo': 'end_station',
+        'Ciclo_EstacionArribo': 'end_station',
         'Retiro': 'begin_time',
         'Arribo': 'end_time'
     })
@@ -60,8 +60,10 @@ def sql_write_df(df, file_name):
                 )
                 print(f'Tabla {file_name} escrita con exito')
                 
-            except:
-                print('Error al escribir ')
+            except Exception:
+                import traceback
+                traceback.print_exc()
+                raise
                 
             nuevo_registro = FileRegister(
                                 file_name=file_name,
