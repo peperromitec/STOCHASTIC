@@ -16,14 +16,15 @@ def sql_write_df(df, file_name):
     
     # Renombrar columnas para que coincidan con data_model.py
     df = df.rename(columns={
-        'Genero_Usuario': 'gender',
-        'Edad_Usuario': 'age',
-        'Bici': 'bicycle_id',
-        'Ciclo_Estacion_Retiro': 'begin_station',
-        'Ciclo_EstacionArribo': 'end_station',
-        'Retiro': 'begin_time',
-        'Arribo': 'end_time'
-    })
+        "Genero_Usuario": "gender",
+        "Edad_Usuario": "age",
+        "Bici": "bicycle_id",
+        "Ciclo_Estacion_Retiro": "begin_station",
+        "Ciclo_EstacionArribo": "end_station",
+        "Ciclo_Estacion_Arribo": "end_station",
+        "Retiro": "begin_time",
+        "Arribo": "end_time",
+        })
 
     # Cargar variables de entorno (ej. usando un archivo .env)
     load_dotenv()
