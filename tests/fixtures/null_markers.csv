@@ -1,0 +1,4 @@
+Genero_Usuario,Edad_Usuario,Bici,CE_retiro,Fecha_retiro,Hora_retiro,CE_arribo,Fecha_arribo,Hora_arribo
+NULL,NULL,0001,001,03/04/2021,10:00:00,271-272,03/04/2021,10:15:00
+ null , NuLl ,A02,001,03/04/2021,11:00:00,271-272,03/04/2021,11:15:00
+  nUlL  ,  null  ,NULL,NULL,03/04/2021,12:00:00, NA ,03/04/2021,12:15:00

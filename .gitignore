@@ -30,3 +30,4 @@ Thumbs.db
 
 # Datos locales que no deban publicarse
 !data/.gitkeep
+downloads/

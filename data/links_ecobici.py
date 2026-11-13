@@ -1,24 +1,17 @@
-import requests
-from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlsplit
 
-def ecobici_links():
+from bs4 import BeautifulSoup
+import requests
+
+
+def ecobici_links(session: requests.Session) -> list[str]:
     url_base = "https://ecobici.cdmx.gob.mx/datos-abiertos/"
-    
-    # 1. Hacemos la petición a la página principal de datos abiertos
-    respuesta = requests.get(url_base)
-    respuesta.raise_for_status() # Verifica que no haya error 404/500
-    
-    # 2. Analizamos el HTML de la página
-    soup = BeautifulSoup(respuesta.text, 'html.parser')
-    
-    links_descarga = []
-    
-    # 3. Buscamos todos los enlaces en la página
-    for etiqueta_a in soup.find_all('a'):
-        href = etiqueta_a.get('href')
-        
-        # 4. Filtramos solo los que son archivos de datos (suelen ser .csv o .zip)
-        if href and (href.endswith('.csv') or href.endswith('.zip')):
-            links_descarga.append('https://ecobici.cdmx.gob.mx'+href)
-            
-    return links_descarga
+    with session.get(url_base, timeout=(10, 60)) as response:
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+    links = []
+    for anchor in soup.find_all("a", href=True):
+        url = urljoin(url_base, anchor["href"])
+        if urlsplit(url).path.lower().endswith(".csv") and url not in links:
+            links.append(url)
+    return links

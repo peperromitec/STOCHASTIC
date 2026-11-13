@@ -1,0 +1,3 @@
+Genero_Usuario,Edad_usuario,Bici,Ciclo_Estacion_Retiro,Fecha_Retiro,Hora_Retiro,Ciclo_Estacion_Arribo,Fecha_Arribo,Hora_Arribo
+F,20,0001,0002,03/04/2021,09:10:11.123456,A03,2021-04-03,09:12:00.5
+M,30,A01,271-272,2021-12-11,23:59:59,0004,12/12/2021,00:01:00

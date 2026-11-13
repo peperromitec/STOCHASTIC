@@ -1,0 +1,6 @@
+Genero_Usuario,Edad_Usuario,Bici,CE_retiro,Fecha_retiro,Hora_retiro,CE_arribo,Fecha_arribo,Hora_arribo
+
+,,,,,,,,
+NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL
+M,,A01,001,NULL,NULL,,NULL,NULL
+,,,,,0:05:06,,,

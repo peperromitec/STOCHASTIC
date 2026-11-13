@@ -1,43 +1,39 @@
-# Source - https://stackoverflow.com/q/35371043
-# Posted by viviwill, modified by community. See post 'Timeline' for change history
-# Retrieved 2026-11-09, License - CC BY-SA 4.0
+"""Descarga de bytes y conservación del original, sin transformar datos."""
 
+import hashlib
+from pathlib import Path, PurePosixPath
+from urllib.parse import unquote, urlsplit
 
 import requests
-import io
-import pandas as pd
 
-url = 'https://ecobici.cdmx.gob.mx/wp-content/uploads/2022/06/2010-02-feb.csv'
 
-def request(url):
-    with requests.Session() as s:
-        download = s.get(url)
-        
-        if download.status_code == 200:
+def csv_file_name(url: str) -> str:
+    name = PurePosixPath(unquote(urlsplit(url).path)).name
+    if not name.lower().endswith(".csv") or name in (".csv", "..csv"):
+        raise ValueError(f"La URL no identifica un CSV: {url}")
+    return name
 
-            decoded_content = download.content.decode('utf-8')
 
-            df = pd.read_csv(io.StringIO(decoded_content), sep=',')
-            # print(df.head())
-            
-            df.columns = df.columns.str.strip().str.lstrip("\ufeff")
-            
-            df.columns = (
-                df.columns
-                .str.lstrip("\ufeff")
-                .str.strip()
-                .str.replace(r"\s+", "_", regex=True)
-            )
-            
-            # Crear las nuevas columnas unificadas combinando fecha y hora con un espacio
-            df['Retiro'] = pd.to_datetime(df['Fecha_Retiro'].astype(str) + ' ' + df['Hora_Retiro'].astype(str), format='mixed')
-            df['Arribo'] = pd.to_datetime(df['Fecha_Arribo'].astype(str) + ' ' + df['Hora_Arribo'].astype(str), format='mixed')
+def download_csv(session: requests.Session, url: str) -> bytes:
+    with session.get(url, timeout=(10, 60)) as response:
+        response.raise_for_status()
+        return response.content
 
-            # Eliminar las columnas originales para limpiar el DataFrame
-            df = df.drop(columns=['Fecha_Retiro', 'Hora_Retiro', 'Fecha_Arribo', 'Hora_Arribo'])
-        
-            
-            return df
-        
-        else:
-            raise ValueError(f"Error 404")
+
+def content_sha256(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
+def archive_csv(content: bytes, file_name: str, archive_dir: Path) -> Path:
+    """No sobrescribe versiones distintas del mismo nombre."""
+    if Path(file_name).name != file_name:
+        raise ValueError(f"Nombre de archivo inseguro: {file_name!r}")
+    target = Path(archive_dir) / content_sha256(content) / file_name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with target.open("xb") as output:
+            output.write(content)
+    except FileExistsError:
+        if target.read_bytes() != content:
+            raise ValueError(f"El original guardado no coincide: {target}")
+    return target

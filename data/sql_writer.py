@@ -1,144 +1,105 @@
-import os
-import datetime
-from dotenv import load_dotenv
-from request import request as rq
+"""Registro y viajes se escriben con la misma conexión y transacción."""
 
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, inspect
+from dataclasses import dataclass
+from datetime import datetime, timezone
 
-from schemas.data_model import Data
-from schemas.file_register_model import FileRegister
-from schemas.base import Base
+import pandas as pd
+from sqlalchemy import func, insert, select, update
+from sqlalchemy.engine import Engine
+from sqlalchemy.exc import IntegrityError
+
+from .normalization import DATA_COLUMNS
+from .schemas.data_model import Data
+from .schemas.file_register_model import FileRegister
 
 
+@dataclass
+class ImportResult:
+    status: str
+    register_id: int | None = None
+    row_count: int = 0
+    related_files: tuple[str, ...] = ()
+    same_row_count_files: tuple[str, ...] = ()
 
-def sql_write_df(df, file_name):
-    
-    # Renombrar columnas para que coincidan con data_model.py
-    df = df.rename(columns={
-        "Genero_Usuario": "gender",
-        "Edad_Usuario": "age",
-        "Bici": "bicycle_id",
-        "Ciclo_Estacion_Retiro": "begin_station",
-        "Ciclo_EstacionArribo": "end_station",
-        "Ciclo_Estacion_Arribo": "end_station",
-        "Retiro": "begin_time",
-        "Arribo": "end_time",
-        })
 
-    # Cargar variables de entorno (ej. usando un archivo .env)
-    load_dotenv()
-    db_user = os.getenv("DB_USER")
-    db_pass = os.getenv("DB_PASSWORD")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_name = os.getenv("DB_NAME", 'ecobici')
+def registered_file(engine: Engine, file_name: str) -> int | None:
+    with engine.connect() as connection:
+        return connection.scalar(
+            select(FileRegister.id).where(FileRegister.file_name == file_name)
+        )
 
-    # Crear el motor (ejemplo para PostgreSQL)
-    URI = f'postgresql://{db_user}:{db_pass}@{db_host}/{db_name}'
-    engine = create_engine(URI)
 
-    # Generar el esquema en la base de datos
-    Base.metadata.create_all(engine)
-    
-    # 1. Crear la fábrica de sesiones asociada a tu motor (engine)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    
+def files_with_content(engine: Engine, sha256: str) -> tuple[str, ...]:
+    with engine.connect() as connection:
+        return tuple(connection.scalars(
+            select(FileRegister.file_name)
+            .where(FileRegister.content_sha256 == sha256)
+            .order_by(FileRegister.file_name)
+        ))
+
+
+def sql_write_df(
+    engine: Engine, frame: pd.DataFrame, file_name: str, sha256: str,
+) -> ImportResult:
+    if set(frame.columns) != set(DATA_COLUMNS) or frame.columns.duplicated().any():
+        raise ValueError(f"{file_name}: se esperaba un DataFrame ya normalizado")
+    if len(sha256) != 64 or any(char not in "0123456789abcdef" for char in sha256):
+        raise ValueError(f"{file_name}: SHA-256 inválido")
     try:
-    # 2. Hacer la consulta: Buscar el primer registro que coincida con el nombre
-        archivo_existente = session.query(FileRegister).filter_by(file_name=file_name).first()
-
-        if archivo_existente:
-            print(f'El archivo {file_name} ya esta registrado')
-        
-        else:
-            try:
-                df.to_sql(
-                    name=Data.__tablename__, 
-                    con=engine,
-                    if_exists='append', 
-                    index=False     # Evita guardar el índice numérico de pandas como una columna en la base de datos
+        with engine.begin() as connection:
+            existing = connection.scalar(
+                select(FileRegister.id).where(FileRegister.file_name == file_name)
+            )
+            if existing is not None:
+                return ImportResult("already_registered", register_id=existing)
+            related = tuple(connection.scalars(
+                select(FileRegister.file_name)
+                .where(FileRegister.content_sha256 == sha256)
+                .order_by(FileRegister.file_name)
+            ))
+            if related:
+                return ImportResult("identical_content", related_files=related)
+            similar_counts = tuple(connection.scalars(
+                select(FileRegister.file_name)
+                .where(FileRegister.row_count == len(frame))
+                .order_by(FileRegister.file_name)
+            ))
+            # Exigir la tabla completa antes de to_sql; nunca crear tablas aquí.
+            connection.execute(select(Data.__table__).limit(0))
+            register_id = connection.scalar(
+                insert(FileRegister).values(
+                    file_name=file_name,
+                    process_date=datetime.now(timezone.utc).replace(tzinfo=None),
+                    content_sha256=sha256,
+                ).returning(FileRegister.id)
+            )
+            trips = frame.assign(file_register_id=register_id)
+            trips.to_sql(
+                Data.__tablename__, con=connection, if_exists="append", index=False,
+                chunksize=10_000,
+            )
+            actual_count = connection.scalar(
+                select(func.count()).select_from(Data)
+                .where(Data.file_register_id == register_id)
+            )
+            if actual_count != len(frame):
+                raise RuntimeError(
+                    f"{file_name}: se esperaban {len(frame)} viajes, se insertaron {actual_count}"
                 )
-                print(f'Tabla {file_name} escrita con exito')
-                
-            except Exception:
-                import traceback
-                traceback.print_exc()
-                raise
-                
-            nuevo_registro = FileRegister(
-                                file_name=file_name,
-                                process_date=datetime.datetime.now()
-                                )
-            session.add(nuevo_registro)
-            
-            session.commit()
-        
-    
-    except Exception as e:
-        # Si algo falla rollback
-        session.rollback()
-        print(f"Error durante el procesamiento: {e}")
-        
-    finally:
-        session.close()
-        
-def test_DB():
-    try:
-        load_dotenv()
-        # 1. Configurar la conexión
-        usuario = os.getenv("DB_USER", "postgres")
-        password = os.getenv("DB_PASSWORD", "password")
-        host = os.getenv("DB_HOST", "localhost")
-        db_name = os.getenv("DB_NAME", "ecobici")
-        
-        uri = f'postgresql://{usuario}:{password}@{host}/{db_name}'
-        engine = create_engine(uri)
-        
-        # 2. Probar la conexión conectándose al motor
-        with engine.connect() as conn:
-            print(f"✅ Conexión exitosa a la base de datos '{db_name}'.")
-
-        # 3. Verificar si las tablas ya existen
-        inspector = inspect(engine)
-        tablas_existentes = inspector.get_table_names()
-        
-        # Obtenemos los nombres de las tablas
-        tabla_viajes = Data.__tablename__
-        tabla_registros = FileRegister.__tablename__
-
-        if tabla_viajes in tablas_existentes and tabla_registros in tablas_existentes:
-            print("✅ El esquema ya existe. Las tablas están listas.")
-        else:
-            # 4. Crear el esquema si faltan tablas
-            print("⚠️ Tablas no encontradas. Creando el esquema...")
-            Base.metadata.create_all(engine)
-            print("✅ Esquema creado exitosamente.")
-            
-        return True
-
-    except Exception as e:
-        print(f"❌ Error al conectar o inicializar la base de datos:\n{e}")
-        return False
-    
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-    
-'''
-url = 'https://ecobici.cdmx.gob.mx/wp-content/uploads/2022/06/2010-02-feb.csv'
-
-df = rq(url)
-
-sql_write_df(df, '2010-02-feb.csv')'''
+            connection.execute(
+                update(FileRegister).where(FileRegister.id == register_id)
+                .values(row_count=actual_count)
+            )
+            result = ImportResult(
+                "imported", register_id, actual_count,
+                same_row_count_files=similar_counts,
+            )
+        # Salir de engine.begin() hace el commit; cualquier fallo se propaga.
+        return result
+    except IntegrityError:
+        # Resuelve la carrera entre la consulta previa y el UNIQUE de file_name.
+        # engine.begin() ya revirtió también cualquier viaje insertado.
+        existing = registered_file(engine, file_name)
+        if existing is not None:
+            return ImportResult("already_registered", register_id=existing)
+        raise

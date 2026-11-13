@@ -1,0 +1,171 @@
+{
+  "file": "/home/vomik/Documents/semestre_5/stochacastic/STOCHASTIC/downloads/ecobici/9232c499dad9c9578434835afb6830f0ea1b55c5dd9409aa5dd8818b0258abfb/2021-08.csv",
+  "content_sha256": "9232c499dad9c9578434835afb6830f0ea1b55c5dd9409aa5dd8818b0258abfb",
+  "total_rows": 354267,
+  "raw_blank_rows": 11084,
+  "raw_blank_or_null_only_rows": 11084,
+  "multiple_missing_definition": "Al menos dos de los siete campos de análisis faltantes",
+  "multiple_missing_rows": 11084,
+  "multiple_missing_breakdown": {
+    "totally_blank": 11084,
+    "only_blank_or_null_markers": 0,
+    "partially_populated": 0
+  },
+  "all_analysis_fields_missing_rows": 11084,
+  "missing_by_analysis_column": {
+    "gender": 18808,
+    "age": 11084,
+    "bicycle_id": 11084,
+    "begin_station": 11084,
+    "end_station": 11084,
+    "begin_time": 11084,
+    "end_time": 11084
+  },
+  "examples": {
+    "totally_blank": [
+      {
+        "csv_record": 343185,
+        "csv_end_line": 343185,
+        "populated_source_columns": []
+      },
+      {
+        "csv_record": 343186,
+        "csv_end_line": 343186,
+        "populated_source_columns": []
+      },
+      {
+        "csv_record": 343187,
+        "csv_end_line": 343187,
+        "populated_source_columns": []
+      },
+      {
+        "csv_record": 343188,
+        "csv_end_line": 343188,
+        "populated_source_columns": []
+      },
+      {
+        "csv_record": 343189,
+        "csv_end_line": 343189,
+        "populated_source_columns": []
+      }
+    ],
+    "only_blank_or_null_markers": [],
+    "partially_populated": []
+  },
+  "source_url": "https://ecobici.cdmx.gob.mx/wp-content/uploads/2022/07/2021-08.csv",
+  "downloaded_at_utc": "2026-11-13T21:46:46.666872+00:00",
+  "empty_rows_source_details": {
+    "header": [
+      "Genero_Usuario",
+      "Edad_Usuario",
+      "Bici",
+      "Ciclo_Estacion_Retiro",
+      "Fecha_Retiro",
+      "Hora_Retiro",
+      "Ciclo_EstacionArribo",
+      "Fecha Arribo",
+      "Hora_Arribo"
+    ],
+    "field_count_distribution": {
+      "9": 11084
+    },
+    "physically_blank_lines": 0,
+    "first_empty_csv_record": 343185,
+    "last_empty_csv_record": 354268,
+    "last_populated_csv_record": 343184,
+    "populated_rows_after_first_empty": 0
+  },
+  "normalization_check": {
+    "rows_preserved": 354267,
+    "notices": [],
+    "quality_issues": [
+      {
+        "column": "gender",
+        "count": 18808,
+        "csv_rows": [
+          243,
+          247,
+          264,
+          271,
+          274
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "age",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "bicycle_id",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "begin_station",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "end_station",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "begin_time",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      },
+      {
+        "column": "end_time",
+        "count": 11084,
+        "csv_rows": [
+          343185,
+          343186,
+          343187,
+          343188,
+          343189
+        ],
+        "message": "valor faltante"
+      }
+    ],
+    "database_accessed": false,
+    "trips_inserted": 0
+  },
+  "source_byte_count": 20248095
+}
