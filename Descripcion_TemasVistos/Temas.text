@@ -1,0 +1,15 @@
+Contenidos
+
+En el tema 1, Toma de decisiones bajo incertidumbre y cadenas de Markov, se abordan el criterio maxi-min, el criterio maxi-max, el criterio de arrepentimiento y el criterio de valor esperado. Asimismo, se estudian las cadenas de Markov, las ecuaciones de Chapman-Kolmogorov, la clasificación de estados, las cadenas ergódicas, las probabilidades límite y los procesos de decisión de Markov.
+
+En el tema 2, Procesos de Poisson, se analizan la distribución exponencial, los procesos de conteo, las distribuciones de tiempo entre eventos, los procesos de Poisson no homogéneos y los procesos de Poisson compuestos.
+
+En el tema 3, Líneas de espera, se revisan los modelos exponenciales, los modelos con un solo servidor, los modelos con varios servidores, los modelos con capacidad finita, el modelo M/G/1 y el modelo G/M/1.
+
+Contenidos Procedimentales
+
+En la unidad 1, Toma de decisiones bajo incertidumbre y Cadenas de Markov, el alumno resolverá problemas de toma de decisiones bajo incertidumbre aplicando los criterios maxi-min, maxi-max, de arrepentimiento y de valor esperado. De igual manera, identificará y clasificará los diferentes estados en una cadena de Markov, la representará matricial y gráficamente, determinará su distribución límite y aplicará procesos de decisión de Markov a la toma de decisiones bajo incertidumbre.
+
+En la unidad 2, Procesos de Poisson, el alumno identificará los procesos de conteo como un caso especial de los procesos estocásticos, identificará los diferentes tipos de Procesos de Poisson y los aplicará a problemas del área de ingeniería y ciencias.
+
+En la unidad 3, Líneas de espera, el alumno identificará los diferentes modelos de líneas de espera y los aplicará a la solución de problemas de ingeniería y ciencias.

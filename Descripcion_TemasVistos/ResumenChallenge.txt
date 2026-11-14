@@ -1,0 +1,109 @@
+Challenge: Smart Bicycle Redistribution under Uncertainty
+Partner Organization
+This challenge is proposed by the research centre Centro para el Futuro de las Ciudades, whose work addresses urban mobility, sustainability and quality of life in metropolitan areas. The centre states the problem, provides the urban context in which the results will be read, and is the recipient of the final recommendation.
+
+Introduction
+Mexico City is one of the largest metropolitan areas in the world, with more than twenty million inhabitants generating millions of daily trips. Despite government efforts improving public transportation, traffic congestion remains one of the city’s most pressing challenges. Long travel times, inefficient vehicle utilization, and highly variable traffic conditions contribute to the inefficiency of the transportation network. Additionally, transportation is also one of the main contributors to local air pollution and greenhouse gas emissions. Pollutants such as particulate matter (PM2.5), nitrogen oxides (NOx), and ozone (O3) have significant impacts on public health, while carbon dioxide (CO2) emissions contribute to climate change. Reducing the use of private motor vehicles has therefore become a strategic objective for improving urban sustainability.
+
+Public bicycle-sharing systems provide an environmentally friendly alternative for short-distance trips and for first- and last-mile connectivity with public transportation. However, their effectiveness depends on the continuous availability of bicycles and of empty docking spaces throughout a strategically positioned network. Because travel demand changes considerably during the day, some stations become emptied of bicycles while others become saturated, reducing service quality and discouraging the adoption of sustainable transportation. Both situations are service failures: an empty station denies a trip, and a saturated station forces a user who has already finished a trip to keep riding to another station.
+
+The bicycle-sharing operator therefore faces a complex decision-making problem under uncertainty. Demand varies according to the time of day, weather conditions, nearby events, road infrastructure, and commuter behavior. Since the resources available for bicycle redistribution are limited, the operator must determine when, where, and how many bicycles should be relocated in order to maximize service availability while minimizing operational costs, and must decide this in advance, before the day’s demand is observed.
+
+In your role as a data science consulting team, your objective is to develop a quantitative decision-support methodology that combines data analysis, stochastic modeling, optimization, and simulation to improve the operation of the bicycle-sharing system. The proposed methodology should provide recommendations that contribute not only to operational efficiency but also to increasing bicycle usage, reducing traffic congestion, and ultimately improving air quality in Mexico City.
+
+Problem Statement
+Design a decision-support system capable of giving recommendations for the (re)distribution of bicycles and a close study of station prioritization and rotation, providing robustness of the proposed strategy under uncertain demand. As extras, the proposed methodology could include operational costs and customer service.
+
+The central difficulty of the project is that service availability is a random quantity and cannot be improved by inspection. It must first be described by a mathematical model built from the data, then turned into a measure that the operator can act on, and only then optimized under the constraints the operator actually faces. Choosing that model, justifying it, and deciding which of the tools of the course apply to it, is the substance of the work. A recommendation is convincing only if the team can explain why its model is a reasonable description of the system and where it stops being one.
+
+Scope
+Each team should work with a connected subnetwork of 10 to 15 stations within a single contiguous zone, restricted to the weekdays of a recent month and to the operating hours of the system. Depth on a small subnetwork will be valued above breadth on a large one, and the selection of both the subnetwork and the period must be justified with the exploratory analysis.
+
+Teams may additionally examine the same month in an earlier year, but only to check whether the patterns they rely on are stable over time; the analysis and the recommendation should remain anchored on the recent period.
+
+
+Data Requirements
+All the data needed for this project are publicly available. Obtaining them, understanding their structure and cleaning them is part of the challenge and is expected to be done by each team.
+
+Trip records
+The historical trip records of the Ecobici system are published as monthly CSV files, one record per individual trip, at
+
+https://ecobici.cdmx.gob.mx/datos-abiertos/Links to an external site.
+
+Files are available by month from 2010 onwards. Each record provides:
+
+Pickup station.
+Drop-off station.
+Trip start time.
+Trip end time.
+The volume is considerable, in the order of millions of trips per year, so the download and the basic cleaning are a genuine part of the work: teams must document the period selected, the records discarded and the reason for discarding them.
+
+The following quantities do not appear in the files but can be derived:
+
+Average velocity, computed from the trip duration and the distance between the origin and destination stations.
+Routes used. Continuous geolocation is not available, but a plausible route can be approximated by the shortest path between the two stations over the street or cycle-lane network, or by matching candidate routes against the observed trip duration.
+Station information
+Station coordinates and docking capacity are published in the real-time feed of the system, under the General Bikeshare Feed Specification, at
+
+https://gbfs.mex.lyftbikes.com/gbfs/en/station_information.jsonLinks to an external site.
+
+The companion feed station_status.json reports the bicycles and free docks currently available at each station. This feed describes the present state only and keeps no history, so a record of observed occupancy over time can be built only by sampling it repeatedly.
+
+Complementary datasets
+These are optional, and should be used only if they support a specific question:
+
+Weather. Available through the open data portal of the city, https://datos.cdmx.gob.mxLinks to an external site., or by requesting historical records from the Tacubaya observatory,
+https://smn.conagua.gob.mx/es/observatorio-tacubayaLinks to an external site..
+Cycle-lane network. https://datos.cdmx.gob.mx/dataset/infraestructura-vial-ciclistaLinks to an external site.
+Population density. Census data from INEGI.
+Metro, metrobus and other transit stations. Available in the mobility section of the city portal, https://datos.cdmx.gob.mxLinks to an external site., under the Secretaría de Movilidad.
+Two remarks
+Speeds and followed routes are not recorded, so anything said about them is a reconstruction and carries the uncertainty of the method used to reconstruct it.
+
+More importantly, the files contain only completed trips. A user who arrives at a station, finds no bicycle and leaves is not registered anywhere, and neither is a user who cannot find a free dock at the intended destination. Teams should consider carefully what this implies for any quantity estimated directly from the observed counts, and in particular whether the stations that appear to have low demand are the ones with low demand or the ones that fail most often.
+
+
+Stages of the Project
+The project advances through the five stages below. Each stage produces an output that the next stage consumes, and each becomes a section of the final report, so that the report is assembled progressively rather than written at the end.
+
+Stage	Focus	Output
+1	Data acquisition and exploratory analysis	Subnetwork and period selected and justified, cleaning decisions documented, descriptive statistics by station and time of day, and identification of the stations that are systematically imbalanced.
+2	Mathematical model	A stochastic model of the system, with its assumptions stated explicitly and confronted with the data, and the estimation of the parameters it requires.
+3	Service analysis and optimization	Performance measures derived from the model, an explicit statement of the decision problem faced by the operator, and a proposed configuration or policy with its estimated improvement over the current one.
+4	Simulation and comparison of strategies	A validated simulation of the system, evaluation of the proposed policy and of the assigned strategy under several demand scenarios, and comparison of the alternatives under the decision criteria of the course.
+5	Impact and conclusions	Final recommendation, sensitivity analysis, and the assessment of the effect on air quality in Mexico City.
+Activities
+Two activities take place while the project is in progress. Neither is a formal examination; both exist so that teams receive correction while there is still time to act on it, and so that no team discovers a fundamental problem with its approach at the end.
+
+Activity 1: Data and framing session
+On completion of the first stage, each team submits a short memo or presentation, stating the subnetwork and period selected, the cleaning decisions taken and the records discarded, the first descriptive results, and the questions the team intends to answer. The session is devoted to discussing these choices. Teams should arrive prepared to defend the selection of their subnetwork and to explain how they handled the trips that the data do not record.
+
+Activity 2: Model review
+On completion of the second stage, and before committing to it computationally, each team presents its proposed model in a short talk of less than ten minutes. The presentation must state what the model represents, which assumptions it rests on, which of those assumptions were tested against the data and with what result, and which quantities the model produces that correspond to the failures the operator cares about. The purpose of this activity is to detect modelling errors early, when correcting them is inexpensive. A model that cannot be explained in ten minutes is usually not yet understood by the team presenting it.
+
+A third, optional session may be held once preliminary results are available, to review each team’s work. Since teams are assigned different strategies, this exchange is also the natural preparation for the final session.
+
+Resources and Support for the Development
+For the correct development of this project students should study the contents of the course along with the bibliography:
+
+Ross, S. M. (2019). Introduction to probability models (12th ed.). Academic Press.
+Ross, S. M. (2013). Simulation (5th ed.). Academic Press.
+Gross, D., Shortle, J. F., Thompson, J. M., & Harris, C. M. (2008). Fundamentals of queueing theory (4th ed.). Wiley.
+Stochastic Processes and their Applications. Frank Beichelt. Taylor & Francis. 2002.
+Procesos estocásticos. (2011). Procesos estocásticos (1st ed.). Ciencias, Universidad Nacional Autónoma de México (UNAM).
+Consultation sessions are available throughout the project. Teams are expected to arrive at them with a specific question and with the work done so far.
+
+Evaluation Criteria and Deliverables
+This project should be made in groups of at most four people, and each group should deliver a presentation and a final written report including all the stages of the project, being: exploratory data analysis, mathematical models, comparison of operational policies, final recommendation, and conclusions.
+
+The conclusions must include an explicit assessment of how the proposed strategy contributes to improving air quality in Mexico City. Teams should translate their operational results into an estimate of the additional bicycle trips generated, the private vehicle trips thereby avoided, and the associated reduction in emissions, stating clearly the assumptions and the uncertainty behind that estimate. A recommendation that improves service without any statement of its environmental effect does not answer the question posed by the partner organization.
+
+Code must be submitted, must run, and must reproduce the figures reported from the raw data. The final presentation is addressed to an audience that includes representatives of the partner centre and decision makers who are not specialists in stochastic processes.
+
+The final project will be evaluated according to the following rubric.
+
+Criterion	Weight	Description
+Report	40%	The project addresses the proposed problem in a complete and coherent manner. The mathematical models are appropriate, assumptions are justified and tested where possible, analyses are rigorous, simulation results are reported with a measure of precision, results are correctly interpreted, and recommendations are supported by quantitative evidence. The report demonstrates scientific thinking, appropriate use of data, and professional documentation.
+Classwork	10%	The team demonstrates effective collaboration throughout the project. During activities, the team shows evidence of coordinated planning, communication, and problem solving.
+Scientific Presentation	50%	The presentation is clear, well organized, and professionally delivered. Mathematical models, assumptions, methodology, and results are effectively communicated to both technical and non-technical audiences. Team members answer questions correctly.
+Total	100%
