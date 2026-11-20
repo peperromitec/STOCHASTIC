@@ -30,3 +30,6 @@ Thumbs.db
 
 # Datos locales que no deban publicarse
 !data/.gitkeep
+
+# Archivos generados por los notebooks
+outputs/
